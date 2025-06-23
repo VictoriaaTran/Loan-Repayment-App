@@ -64,7 +64,7 @@ for idx in st.session_state.input_ids:
     interest = st.session_state.get(f"b_{idx}")
     total_interest += ((interest/100)*loan) if interest and loan is not None else 0
 
-total_loan = total + total_interest
+total_loan = (total + total_interest) if total and total_interest is not None else 0
 
 with col_principal:
     st.metric(label="Total Loan Paid:", value=f"${total_loan:,.2f}" if total_loan is not None else 0)
