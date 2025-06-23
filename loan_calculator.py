@@ -52,11 +52,15 @@ for idx in st.session_state.input_ids:
     if val is not None:
         total += val
 
+# payment term
+payment_term = st.number_input(label="Payment Term (Year):", min_value=0, max_value=50, placeholder="Enter term (year)")
+
+# display total loan balance
 total_placeholder.metric(label="Total Loan Balance:", value=f"${total:,.2f}" if total is not None else f'$0')
 
 # repayments calculation
 st.write("### Repayments")
-col_principal, col_interest_repay= st.columns(2)
+col_principal, col_interest_repay, col_monthly_pay= st.columns(3)
 total_interest = ((interest_rate if interest_rate is not None else 0)/100)*debt_input if debt_input is not None else 0
 
 for idx in st.session_state.input_ids:
@@ -66,7 +70,18 @@ for idx in st.session_state.input_ids:
 
 total_loan = (total + total_interest) if total and total_interest is not None else 0
 
+# calculate monthly rate and number of payments
+months = payment_term * 12 
+
+if months > 0:
+    monthly_rate = total_loan/months
+else:
+    monthly_rate = 0
+
+# display repayments metrics
 with col_principal:
     st.metric(label="Total Loan Paid:", value=f"${total_loan:,.2f}" if total_loan is not None else 0)
 with col_interest_repay:
     st.metric(label="Total Interest Paid:", value=f"${total_interest:,.2f}" if total_interest is not None else 0)
+with col_monthly_pay:
+    st.metric(label="Monthly Payment:", value=f"${monthly_rate:,.2f}" if monthly_rate is not None else 0)
