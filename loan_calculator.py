@@ -85,3 +85,4 @@ with col_interest_repay:
     st.metric(label="Total Interest Paid:", value=f"${total_interest:,.2f}" if total_interest is not None else 0)
 with col_monthly_pay:
     st.metric(label="Monthly Payment:", value=f"${monthly_rate:,.2f}" if monthly_rate is not None else 0)
+    
