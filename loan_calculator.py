@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 # import matplotlib.pyplot as plt
 import uuid
+import numpy as np
 
 # header
 st.title('Student Loan Repayment Calculator')
@@ -32,14 +33,6 @@ for idx in st.session_state.input_ids:
         if st.button("Remove", key=f"remove_{idx}"):
             to_remove = idx
 
-# removing the row
-if to_remove:
-    st.session_state.input_ids.remove(to_remove)
-    # Clean up associated keys
-    st.session_state.pop(f"a_{to_remove}", None)
-    st.session_state.pop(f"b_{to_remove}", None)
-    st.rerun()
-
 # button to dynamically add more inputs
 if st.button("➕ Add Another Input"):
     st.session_state.input_ids.append(str(uuid.uuid4()))
@@ -50,7 +43,7 @@ total = debt_input
 for idx in st.session_state.input_ids:
     val = st.session_state.get(f"a_{idx}")
     if val is not None:
-        total += val
+        total += val #total principal 
 
 # payment term
 payment_term = st.number_input(label="Payment Term (Year):", min_value=0, max_value=50, placeholder="Enter term (year)")
@@ -60,29 +53,40 @@ total_placeholder.metric(label="Total Loan Balance:", value=f"${total:,.2f}" if 
 
 # repayments calculation
 st.write("### Repayments")
-col_principal, col_interest_repay, col_monthly_pay= st.columns(3)
-total_interest = ((interest_rate if interest_rate is not None else 0)/100)*debt_input if debt_input is not None else 0
+col_loan_repay, col_interest_repay, col_monthly_pay= st.columns(3)
 
+total_interest = debt_input * (interest_rate/100) * payment_term if (debt_input and interest_rate) is not None else 0
+
+# step 1: calculate interest for each loan
 for idx in st.session_state.input_ids:
-    loan = st.session_state.get(f"a_{idx}")
-    interest = st.session_state.get(f"b_{idx}")
-    total_interest += ((interest/100)*loan) if interest and loan is not None else 0
+    each_loan = st.session_state.get(f"a_{idx}")
+    each_interest = st.session_state.get(f"b_{idx}")
+    total_interest += each_loan * (each_interest/100) * payment_term if (each_loan and each_interest) is not None else 0
 
-total_loan = (total + total_interest) if total and total_interest is not None else 0
-
-# calculate monthly rate and number of payments
-months = payment_term * 12 
-
-if months > 0:
-    monthly_rate = total_loan/months
-else:
-    monthly_rate = 0
+months = payment_term * 12
+# step 2: Calculate monthly payment
+total_payment = total + total_interest if (total and total_interest) is not None else 0
+monthly_payment = (total_payment/ months) if months > 0 else 0
 
 # display repayments metrics
-with col_principal:
-    st.metric(label="Total Loan Paid:", value=f"${total_loan:,.2f}" if total_loan is not None else 0)
+with col_loan_repay:
+    st.metric(label="Total Loan Paid:", value=f"${total_payment:,.2f}" if total_payment is not None else 0)
 with col_interest_repay:
     st.metric(label="Total Interest Paid:", value=f"${total_interest:,.2f}" if total_interest is not None else 0)
 with col_monthly_pay:
-    st.metric(label="Monthly Payment:", value=f"${monthly_rate:,.2f}" if monthly_rate is not None else 0)
+    st.metric(label="Monthly Payment:", value=f"${monthly_payment:,.2f}" if monthly_payment is not None else 0)
+
+# create dataframe from repayment data
+# df = {
+#     'date': np.arange(start=1, stop=payment_term if payment_term >= 10 else months, step=1, dtype=None),
+#     'payment': 
+# }
     
+
+# removing the row - rerun() temporary forget temp variables, therefore we will set the condition last
+if to_remove:
+    st.session_state.input_ids.remove(to_remove)
+    # Clean up associated keys
+    st.session_state.pop(f"a_{to_remove}", None)
+    st.session_state.pop(f"b_{to_remove}", None)
+    st.rerun()
