@@ -85,7 +85,7 @@ pie_data = {
 }
 df_pie = pd.DataFrame(pie_data)
 fig = px.pie(df_pie, names='Category', values='Value', title='Loan Repayment Ratio')
-st.plotly_chart(fig, on_select='rerun')
+st.plotly_chart(fig)
 
 # removing the row 
 if to_remove:
