@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import uuid
-# import plotly.express as px
-import matplotlib.pyplot as plt
 
 # set page config
 st.set_page_config(page_title="Loan Repayment Calculator", layout='wide')
