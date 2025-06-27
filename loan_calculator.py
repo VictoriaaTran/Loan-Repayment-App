@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import uuid
-import plotly.express as px
+# import plotly.express as px
+import matplotlib.pyplot as plt
 
 # set page config
 st.set_page_config(page_title="Loan Repayment Calculator", layout='wide')
@@ -78,14 +79,15 @@ with col_monthly_pay:
     st.metric(label="Monthly Payment:", value=f"${monthly_payment:,.2f}" if monthly_payment is not None else 0)
 
 # create dataframe from repayment data
-# pie chart
-pie_data = {
-    'Category': ['Total Payment', 'Total Interest'],
-    'Value': [total_payment, total_interest]
-}
-df_pie = pd.DataFrame(pie_data)
-fig = px.pie(df_pie, names='Category', values='Value', title='Loan Repayment Ratio')
-st.plotly_chart(fig)
+# # pie chart
+# pie_data = {
+#     'Category': ['Total Payment', 'Total Interest'],
+#     'Value': [total_payment, total_interest]
+# }
+# df_pie = pd.DataFrame(pie_data)
+# # fig = px.pie(df_pie, names='Category', values='Value', title='Loan Repayment Ratio')
+# fig = plt.pie(pie_data['Value'], autopct='%1.1f%%')
+# # st.plotly_chart(fig)
 
 # removing the row 
 if to_remove:
