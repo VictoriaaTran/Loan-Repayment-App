@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import plotly.express as px
 import uuid
 import numpy as np
 
+# set page config
+st.set_page_config(page_title="Loan Repayment Calculator", layout='wide')
 # header
 st.title('Student Loan Repayment Calculator')
 
@@ -14,8 +17,8 @@ st.write('### Inputs')
 
 # initialize input template - total loan and interest rate
 col_debt, col_interest, _ = st.columns([6,6,2]) #creating columns
-debt_input = col_debt.number_input("Your Loan Balance ($):", value=None, placeholder='Enter amount')
-interest_rate = col_interest.number_input("Interest Rate (%):", value=None, placeholder='Enter rate')
+debt_input = col_debt.number_input("Your Loan Balance ($):", value=None, key='debt_input', placeholder='Enter amount')
+interest_rate = col_interest.number_input("Interest Rate (%):", value=None, key='interest_rate',placeholder='Enter rate')
 
 # initialize the number of inputs- based on ids
 if 'input_ids' not in st.session_state:
@@ -77,13 +80,16 @@ with col_monthly_pay:
     st.metric(label="Monthly Payment:", value=f"${monthly_payment:,.2f}" if monthly_payment is not None else 0)
 
 # create dataframe from repayment data
-# df = {
-#     'date': np.arange(start=1, stop=payment_term if payment_term >= 10 else months, step=1, dtype=None),
-#     'payment': 
-# }
-    
+# pie chart
+pie_data = {
+    'Category': ['Total Payment', 'Total Interest'],
+    'Value': [total_payment, total_interest]
+}
+df_pie = pd.DataFrame(pie_data)
+fig = px.pie(df_pie, names='Category', values='Value', title='Loan Repayment Ratio')
+st.plotly_chart(fig, on_select='rerun')
 
-# removing the row - rerun() temporary forget temp variables, therefore we will set the condition last
+# removing the row 
 if to_remove:
     st.session_state.input_ids.remove(to_remove)
     # Clean up associated keys
